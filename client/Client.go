@@ -31,5 +31,15 @@ func main() {
 	client.Call("API.AddItem", c, &reply)
 	client.Call("API.GetDB", "", &db)
 
-	fmt.Println("Database: ", db)
+	fmt.Println("Database 1: ", db)
+
+	client.Call("API.EditItem", Item{"Second", "New second item"}, &reply)
+
+	client.Call("API.DeleteItem", a, &reply)
+	client.Call("API.GetDB", "", &db)
+	fmt.Println("Database 2: ", db)
+
+	client.Call("API.GetByName", "First", &reply)
+	fmt.Println("First item", reply)
+
 }

@@ -21,12 +21,12 @@ func (a *API) GetDB(title string, reply *[]Item) error {
 	return nil
 }
 
-func (a *API) GetByName(title string, reply *Item) error {
+func (a *API) GetByName(Title string, reply *Item) error {
 
 	var getItem Item
 
 	for _, val := range database {
-		if val.title == title {
+		if val.Title == Title {
 			getItem = val
 
 		}
@@ -57,10 +57,10 @@ func (a *API) EditItem(edit Item, reply *Item) error {
 		// fmt.Println("Edit Title: ", edit.title)
 		// fmt.Println("In for ")
 
-		if val.title == edit.title {
+		if val.Title == edit.Title {
 
 			// fmt.Println("Idx: ", idx)
-			database[idx] = Item{edit.title, edit.body}
+			database[idx] = Item{edit.Title, edit.Body}
 			changed = database[idx]
 
 		}
@@ -77,7 +77,7 @@ func (a *API) DeleteItem(item Item, reply *Item) error {
 
 	for idx, val := range database {
 
-		if val.title == item.title && val.body == item.body {
+		if val.Title == item.Title && val.Body == item.Body {
 
 			database = append(database[:idx], database[idx+1:]...)
 
