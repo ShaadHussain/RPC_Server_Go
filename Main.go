@@ -1,15 +1,25 @@
 package main
 
-import "fmt"
+import (
+	"log"
+	"net"
+	"net/http"
+	"net/rpc"
+)
 
 type Item struct {
-	title string
-	body  string
+	Title string
+	Body  string
 }
 
 type API int
 
 var database []Item
+
+func (a *API) GetDB(title string, reply *[]Item) error {
+	*reply = database
+	return nil
+}
 
 func (a *API) GetByName(title string, reply *Item) error {
 
@@ -62,7 +72,7 @@ func (a *API) EditItem(edit Item, reply *Item) error {
 	return nil
 }
 
-func DeleteItem(item Item) Item {
+func (a *API) DeleteItem(item Item, reply *Item) error {
 	var del Item
 
 	for idx, val := range database {
@@ -77,33 +87,61 @@ func DeleteItem(item Item) Item {
 		}
 	}
 
-	return del
+	*reply = del
+
+	return nil
 }
 
 func main() {
 
-	fmt.Println("initial db: ", database)
-	a := Item{"first", "test item 1"}
-	b := Item{"2", "test item 2"}
-	c := Item{"third", "test item 3"}
+	var api = new(API)
 
-	AddItem(a)
-	AddItem(b)
-	AddItem(c)
+	err := rpc.Register(api)
 
-	fmt.Println("2nd db", database)
+	if err != nil {
+		log.Fatal("Error registering api", err)
 
-	DeleteItem(b)
+	}
 
-	fmt.Println("db 3", database)
+	rpc.HandleHTTP()
 
-	EditItem("third", Item{"fourth", "3's rplced"})
+	listener, err := net.Listen("tcp", ":4040")
 
-	fmt.Println("db 4", database)
+	if err != nil {
 
-	x := GetByName("3 new")
-	y := GetByName("first")
+		log.Fatal("Listener error", err)
+	}
 
-	fmt.Println(x, y)
+	log.Printf("Serving rpc on port %d", 4040)
+
+	err = http.Serve(listener, nil)
+
+	if err != nil {
+		log.Fatal("Error serving", err)
+	}
+
+	// fmt.Println("initial db: ", database)
+	// a := Item{"first", "test item 1"}
+	// b := Item{"2", "test item 2"}
+	// c := Item{"third", "test item 3"}
+
+	// AddItem(a)
+	// AddItem(b)
+	// AddItem(c)
+
+	// fmt.Println("2nd db", database)
+
+	// DeleteItem(b)
+
+	// fmt.Println("db 3", database)
+
+	// EditItem("third", Item{"fourth", "3's rplced"})
+
+	// fmt.Println("db 4", database)
+
+	// x := GetByName("3 new")
+	// y := GetByName("first")
+
+	// fmt.Println(x, y)
 
 }
